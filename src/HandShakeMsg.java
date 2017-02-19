@@ -1,3 +1,5 @@
+package src;
+
 import java.io.*;
 
 public class HandShakeMsg implements Serializable 
@@ -12,6 +14,7 @@ public class HandShakeMsg implements Serializable
 	public HandShakeMsg (int peerID) 
 	{
 		this.PeerID = peerID;
+		//TODO 10 byte zero bits using BitSet
 		Header = "P2PFILESHARINGPROJ";
 	}
 	
@@ -24,7 +27,7 @@ public class HandShakeMsg implements Serializable
     }
 	
 	public void SendHandShake (OutputStream out) throws IOException 
-	{			  
+	{  
 		ObjectOutputStream ostream = new ObjectOutputStream(out);  			  
 		ostream.writeObject(this);
 		System.out.println("sending handshake message with peer" + this.PeerID);
