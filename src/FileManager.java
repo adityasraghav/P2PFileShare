@@ -41,21 +41,32 @@ public class FileManager
 	 * @return byte format of the pieces available
 	 * @throws Exception
 	 */
-	public byte[] getBitField() throws Exception {
-		
-		int size = filePiecesOwned.length;
-		BitSet bSet = new BitSet(size);
-		
-		for(int i =0;i<size;i++)
-		{
-			if(filePiecesOwned[i])
-				bSet.set(i);
-			else
-				bSet.clear(i);
-		}
-		return bSet.toByteArray();
+    public byte[] getBitField() throws Exception {
 
-	}
+        /*int size = filePiecesOwned.length;
+        BitSet bSet = new BitSet(size);
+
+        for(int i =0;i<size;i++)
+        {
+                if(filePiecesOwned[i])
+                        bSet.set(i);
+                else
+                        bSet.clear(i);
+        }
+        return bSet.toByteArray();*/
+        int size = (int)Math.ceil((double)noOfFilePieces/8);
+        byte[] bitfield = new byte[size];
+        //if(noOfPiecesAvailable == 0)
+        //      return null;
+
+        int counter = 0;
+        for(int i=0;i<noOfFilePieces;i=i+8){
+                bitfield[counter++] = FileUtilities.boolToByte(Arrays.copyOfRange(filePiecesOwned, i, i+8));
+        }
+
+        return bitfield;
+
+    }
 	
 	
 
@@ -164,7 +175,8 @@ public class FileManager
 	 */
 	public static boolean compareBitfields(byte[] neighborBitfield, byte[] bitfield){
 		boolean flag = false;
-		byte[] interesting = new byte[(int)Math.ceil(noOfFilePieces/8)];
+		int size = (int)Math.ceil((double)noOfFilePieces/8);
+		byte[] interesting = new byte[size];
 		if(neighborBitfield == null) return flag;
 		for(int i=0;i<bitfield.length;i++){
 			interesting[i] = (byte) ((bitfield[i]^neighborBitfield[i])&neighborBitfield[i]);
@@ -183,8 +195,8 @@ public class FileManager
 	 */
 	public static int requestPiece(byte[] neighborBitfield, byte[] bitfield)
 	{
-		byte[] interesting = new byte[(int)Math.ceil(noOfFilePieces/8)];
-		
+		int size = (int)Math.ceil((double)noOfFilePieces/8);
+		byte[] interesting = new byte[size];
 		boolean[] interestingPieces = new boolean[noOfFilePieces];
 		
 		for(int i=0,j=0;i<bitfield.length;i++,j=j+8){

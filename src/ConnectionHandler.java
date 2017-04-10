@@ -53,6 +53,8 @@ public class ConnectionHandler extends Thread{
 	public void sendMessage(Message msg){
 		try {
 			sout.writeObject(msg);
+			sout.reset();
+			sout.flush();
 		} catch (IOException e) {
 			System.out.println(host.getPeerId()+": Error sending message to "+neighbor.getPeerId());
 			e.printStackTrace();
@@ -67,12 +69,12 @@ public class ConnectionHandler extends Thread{
 				Message recv = null;
 				// flag to check choke and unchoke status
 				boolean flagUnchoke = false;
-				//synchronized (host_sin) {
-				try {
-					recv = (Message) host_sin.readObject();
-					System.out.println("Received message type: "+ recv.getMsgType() +"from: "+neighbor.getPeerId());
-					if(recv != null){
-						switch (recv.getMsgType()){
+				while(true){
+					try {
+						recv = (Message) host_sin.readObject();
+						System.out.println("Received message type: "+ recv.getMsgType() +"from: "+neighbor.getPeerId());
+						if(recv != null){
+							switch (recv.getMsgType()){
 							case UNCHOKE:{
 								flagUnchoke = true;
 								sendRequest();
@@ -85,7 +87,7 @@ public class ConnectionHandler extends Thread{
 								HavePayload have = (HavePayload)(recv.mPayload);
 								neighbor.updateBitfield(have.getIndex());
 								System.out.println("Peer "+neighbor.getPeerId()+" contains interesting file pieces");
-								
+
 								//Check whether the piece is interesting and send interested message	
 								if(FileManager.isInteresting(have.getIndex()))
 								{
@@ -107,20 +109,20 @@ public class ConnectionHandler extends Thread{
 								pHandler.remove(neighbor);
 								break;
 							case BITFIELD:{
-						    	BitfieldPayload in_payload = (BitfieldPayload)(recv.mPayload);
-						    	System.out.println("Received Bitfield Message from : "+neighbor.getPeerId());
-						    	//setting bitfield for the neighboring peer
-						        neighbor.setBitfield(in_payload.getBitfield());
-						    	if(!FileManager.compareBitfields(in_payload.getBitfield(),host.getBitfield() )){
-						    		System.out.println("Peer "+neighbor.getPeerId()+" does not contain any interesting file pieces");
-						    		Message notInterested = new Message(MessageType.NOT_INTERESTED,null);
+								BitfieldPayload in_payload = (BitfieldPayload)(recv.mPayload);
+								//setting bitfield for the neighboring peer
+								neighbor.setBitfield(in_payload.getBitfield());
+								if(!FileManager.compareBitfields(in_payload.getBitfield(),host.getBitfield() )){
+									System.out.println("Peer "+neighbor.getPeerId()+" does not contain any interesting file pieces");
+									Message notInterested = new Message(MessageType.NOT_INTERESTED,null);
 									sendMessage(notInterested);
-						    	}
+									break;
+								}
 								System.out.println("Peer "+neighbor.getPeerId()+" contains interesting file pieces");
 								Message interested = new Message(MessageType.INTERESTED,null);
 								sendMessage(interested);
-						    	// No need to add peers that you are interested in.
-							
+								// No need to add peers that you are interested in.
+
 								break;}
 							case PIECE:{
 
@@ -132,18 +134,21 @@ public class ConnectionHandler extends Thread{
 									e.printStackTrace();
 								}
 								host.updateBitfield(((PiecePayload)recv.mPayload).getIndex());
-								
+
 								pHandler.sendHaveAll(((PiecePayload)recv.mPayload).getIndex());
 								piecesDownloaded++;
 								if(flagUnchoke)sendRequest();
 								break;}
+							}
 						}
+					} catch (ClassNotFoundException | IOException e) {
+						System.out.println(host.getPeerId()+": Error recieving message from "+neighbor.getPeerId());
+						e.printStackTrace();
+					} catch (Exception e){
+						e.printStackTrace();
 					}
-				} catch (ClassNotFoundException | IOException e) {
-					System.out.println(host.getPeerId()+": Error recieving message from "+neighbor.getPeerId());
-					e.printStackTrace();
+					//}
 				}
-			//}
 			}
 			/**
 			 * Sends request message with piece index to neighbor
