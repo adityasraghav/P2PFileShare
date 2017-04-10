@@ -11,16 +11,16 @@ import java.util.TreeSet;
 
 public class PeerHandler extends Thread{
 		
-	private static ServerSocket sSocket;
+	private ServerSocket sSocket;
 	
 	//Stores the peer process objects in a map
 	private static HashMap<Integer,Peer> peers;
 
-	private static ArrayList<Peer> interested = new ArrayList<Peer>();
+	private ArrayList<Peer> interested = new ArrayList<Peer>();
 	
-	private static ArrayList<Peer> kPeers;
+	private ArrayList<Peer> kPeers;
 	
-	private static Peer optUnchokedPeer;
+	private Peer optUnchokedPeer;
 	
 	private Peer hostPeer;
 	
