@@ -54,7 +54,7 @@ public class PeerHandler extends Thread{
 					synchronized(interested){
 						// reselecting k preferred peers in time intervals of 'UnchokingInterval' from config
 						do{
-							System.out.println("Finding k preferred peers");
+							//System.out.println("Finding k preferred peers");
 							if(interested.size() != 0){
 								kPeers = new ArrayList<Peer>();
 								// Sorts interested peers with respect to downloading rates only when host does not have the complete file

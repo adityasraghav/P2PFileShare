@@ -16,7 +16,7 @@ public class FileUtilities {
 	public static boolean[] byteToBoolean(byte val){
 		boolean[] bool = new boolean[8];
 		for(int i=0;i<8;i++){
-			bool[i] = (val&1)==1?true:false;
+			bool[7-i] = (val&1)==1?true:false;
 			val = (byte) (val>>1);
 		}
 		return bool;
