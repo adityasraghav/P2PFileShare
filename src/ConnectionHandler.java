@@ -5,6 +5,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ConnectException;
 import java.net.Socket;
+import java.net.SocketException;
 /**
  * Contains connection related information between host peer and neighboring peer including object streams
  * to read and write from the connection.
@@ -144,7 +145,11 @@ public class ConnectionHandler extends Thread{
 								break;}
 							}
 						}
-					} catch (ClassNotFoundException | IOException e) {
+					}catch (SocketException e) {						
+						neighbor.setPeerUp(false);
+					} 
+					catch (ClassNotFoundException | IOException e) {		
+						
 						System.out.println(host.getPeerId()+": Error recieving message from "+neighbor.getPeerId());
 						e.printStackTrace();
 					} catch (Exception e){
