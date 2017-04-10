@@ -1,8 +1,11 @@
 package src;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
@@ -21,7 +24,7 @@ import java.util.HashMap;
 public class PeerProcess extends Peer implements Runnable{
 	
 	//Stores the peer process objects in a map
-	private HashMap<Integer,Peer> peers = new HashMap<Integer,Peer>();
+	private static HashMap<Integer,Peer> peers = new HashMap<Integer,Peer>();
 	
 	private final PeerHandler pHandler;
 	
@@ -33,15 +36,13 @@ public class PeerProcess extends Peer implements Runnable{
 	
 	private FileManager fileData;
 	
-	public PeerProcess(String pid, String hName, String portno, String present, HashMap<Integer,Peer> peers){
+	public PeerProcess(String pid, String hName, String portno, String present){
 		super(pid,hName,portno,present);
-		this.peers = peers;
 		pHandler = new PeerHandler(sSocket, this.getInstance(), peers);
 	}
 	
-	public PeerProcess(int pid, String hName, int portno, boolean present, HashMap<Integer,Peer> peers){
+	public PeerProcess(int pid, String hName, int portno, boolean present){
 		super(pid,hName,portno,present);
-		this.peers = peers;
 		pHandler = new PeerHandler(sSocket, this.getInstance(), peers);
 	}
 	
@@ -55,11 +56,12 @@ public class PeerProcess extends Peer implements Runnable{
 			//Sending Handshake message to all other peers
 			for (Peer pNeighbor : peers.values()){
 				Socket s = new Socket(pNeighbor.getHostname(), pNeighbor.getPortNo());
-				pNeighbor.setHostSocket(s);				
 				ObjectOutputStream out = new ObjectOutputStream(s.getOutputStream());
+				out.flush();
 				System.out.println("Handshake Message sent from peer "+getPeerId()+" to peer "+pNeighbor.getPeerId());                    	                   	
 				out.writeObject(new HandShakeMsg(getPeerId()));
 				out.flush();
+				pNeighbor.setHostSocket(s);				
 			}
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
@@ -117,14 +119,13 @@ public class PeerProcess extends Peer implements Runnable{
 
 		//Creating connection irrespective of peers being interested
 		Peer neighbor = peers.get(incoming.getPeerId());
-		ConnectionHandler conn = new ConnectionHandler(neighbor, peers.get(incoming.getPeerId()),in, out, lSocket, pHandler);
+		ConnectionHandler conn = new ConnectionHandler(this, neighbor,in, out, lSocket, pHandler);
 		conn.start();
 		neighbor.setConnHandler(conn);
 
 		//Sending Bitfield message
 		BitfieldPayload out_payload = new BitfieldPayload(fileData.getBitField());
-		out.writeObject(new Message(MessageType.BITFIELD, out_payload));
-		out.flush();
+		conn.sendMessage(new Message(MessageType.BITFIELD, out_payload));
 		System.out.println("Sending Bitfield Message from: "+
 				getPeerId()+" to: "+incoming.getPeerId());
 
@@ -136,25 +137,59 @@ public class PeerProcess extends Peer implements Runnable{
 		fileData = new FileManager(getPeerId(), getFilePresent());
 		try {
 			setBitfield(fileData.getBitField());
-    		sSocket = new ServerSocket(this.getPortNo());
-    	} catch (Exception e) {
-    		System.out.println("Error opening socket");
-    		e.printStackTrace();
-    	}
+			sSocket = new ServerSocket(this.getPortNo());
+		} catch (Exception e) {
+			System.out.println("Error opening socket");
+			e.printStackTrace();
+		}
 		startServer();
 		startSender();
 		pHandler.setSocket(sSocket);
 		pHandler.start();
-		
+
 		Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-    	    public void run() {
-    	    	try {
+			public void run() {
+				try {
 					sSocket.close();
+					for(Peer p: peers.values()){
+						p.getHostSocket().close();
+					}
 				} catch (IOException e) {
 					System.out.println("Error closing socket of peer "+getPeerId());
 					e.printStackTrace();
 				}
-    	    }
-    	}));
+			}
+		}));
+	}
+	
+	public static void main(String[] ar){
+		getConfiguration();
+	}
+	public static void getConfiguration()
+	{
+		String st;
+		try {
+			String hostname = InetAddress.getLocalHost().getHostName();
+			String FileName = "PeerInfo.cfg";
+			BufferedReader in = new BufferedReader(new FileReader(FileName));
+			
+			PeerProcess hostPeer = null;
+					
+			while((st = in.readLine()) != null) {	
+				String[] tokens = st.split("\\s+");
+				if(hostname.equalsIgnoreCase(tokens[1])){
+					hostPeer = new PeerProcess(tokens[0],tokens[1],tokens[2],tokens[3]);
+				}else{
+					Peer peer = new Peer(tokens[0],tokens[1],tokens[2],tokens[3]);
+					peers.put(Integer.parseInt(tokens[0]),peer);
+				}
+			}
+			in.close();
+			
+			new Thread(hostPeer).start();
+		}
+		catch (Exception ex) {
+			System.out.println(ex.toString());
+		}
 	}
 }
