@@ -180,6 +180,7 @@ public class PeerProcess extends Peer implements Runnable{
 	
 	public static void main(String[] ar){
 		getConfiguration();
+		System.out.println("Start");
 	}
 	public static void getConfiguration()
 	{
