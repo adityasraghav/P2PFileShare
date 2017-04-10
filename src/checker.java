@@ -5,7 +5,7 @@ public class checker {
 
 	public static void main(String[] ar){
 		
-		byte b = (byte) -128;
+		byte b = (byte) 5;
 		
 		
 		byte c = (byte) 0;
