@@ -95,7 +95,7 @@ public class ConnectionHandler extends Thread{
 									sendMessage(interested);
 								}
 								break;}
-							case REQUEST:{
+							case REQUEST: {
 								int requestedIndex = ((RequestPayload)recv.mPayload).getIndex();
 								byte [] pieceContent = FileManager.get(requestedIndex).getContent();
 								int pieceIndex = FileManager.get(requestedIndex).getIndex();
@@ -171,6 +171,7 @@ public class ConnectionHandler extends Thread{
 	public void run(){
 		
 		receiveMessage();
+		FileManager.checker();
 		neighbor.setDownloadSpeed(piecesDownloaded);
 	}
 	

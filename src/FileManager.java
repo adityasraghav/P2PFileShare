@@ -7,8 +7,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.Arrays;
-import java.util.BitSet;
+
 import java.util.Hashtable;
+
 
 /**
  * @author Aditya Singh Raghav
@@ -77,7 +78,7 @@ public class FileManager
 	 */
 	public FileManager(int peerid , boolean has) 
 	{
-		directory = "../peer_" + peerid + "/";
+		directory = "peer_" + peerid + "/";
 		fileName = ConfigParser.getFileName();
 		
 		filePiecesOwned = new boolean[noOfFilePieces];
@@ -110,6 +111,7 @@ public class FileManager
 				e.printStackTrace();
 			}
 		}	
+		checker();
 	}
 	
 	/**
@@ -198,17 +200,47 @@ public class FileManager
 		int size = (int)Math.ceil((double)noOfFilePieces/8);
 		byte[] interesting = new byte[size];
 		boolean[] interestingPieces = new boolean[noOfFilePieces];
+		int finLength;
 		
-		for(int i=0,j=0;i<bitfield.length;i++,j=j+8){
+		if(size>1)
+			finLength = (noOfFilePieces%(size-1));
+		else
+			finLength = noOfFilePieces;
+		int start;
+		int end;
+		
+		for(int i=0,j=0;i<bitfield.length;i++){
 			interesting[i] = (byte) ((bitfield[i]^neighborBitfield[i])&neighborBitfield[i]);
-			System.arraycopy(FileUtilities.byteToBoolean(interesting[i]), 0, interestingPieces, j, 8);
+			
+			if(i==size-1)
+			{
+				start = 8-finLength; 
+				end = finLength;
+			}	
+			else
+			{
+				start = 0;
+				end = 8;
+			}
+			boolean[] x = FileUtilities.byteToBoolean(interesting[i]);
+			System.arraycopy(x, start, interestingPieces, j, end);
+			
+			if(j+8<noOfFilePieces)
+				j=j+8;
+			else
+				j=noOfFilePieces-finLength;
+		
 		}
+		
 		for(int i=0; i<noOfFilePieces; i++){
 			if(interestingPieces[i] == true && !requestedPieces.containsKey(i))
+			{
+				requestedPieces.put(i, i);
 				return i;
+			}
 		}
 		// TODO make it fail safe
-		return 0;
+		return -1;
 	}
 	
 	
@@ -233,4 +265,30 @@ public class FileManager
 			return false;
 		return true;
 	}
+	
+	public static void checker(){
+
+		(new Thread() {
+			@Override
+			public void run() 
+			{
+				try {
+					do 
+					{
+						Thread.sleep(60000);
+						for(Integer ind : requestedPieces.keySet())
+						{
+							if(!filePiecesOwned[ind])
+								requestedPieces.remove(ind);			
+						}
+					} while (noOfFilePieces<noOfFilePieces);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}).start();
+
+	}
+	
 }
