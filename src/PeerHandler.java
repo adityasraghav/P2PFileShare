@@ -54,7 +54,7 @@ public class PeerHandler extends Thread{
 					synchronized(interested){
 						// reselecting k preferred peers in time intervals of 'UnchokingInterval' from config
 						do{
-							System.out.println("Finding k preferred peers");
+							PeerProcess.getLogger().println("Finding k preferred peers");
 							if(interested.size() != 0){
 								kPeers = new ArrayList<Peer>();
 								// Sorts interested peers with respect to downloading rates only when host does not have the complete file
@@ -109,7 +109,7 @@ public class PeerHandler extends Thread{
 					synchronized(interested){
 						// reselecting optimistic peer in time intervals of 'OptimisticUnchokingInterval' from config
 						do{
-							System.out.println("Finding optimistic peer");
+							PeerProcess.getLogger().println("Finding optimistic peer");
 							Peer p;
 							Random r = new Random();
 							Peer[] prs = interested.toArray(new Peer[interested.size()]);

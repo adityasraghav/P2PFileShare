@@ -212,7 +212,7 @@ public class FileManager
 				j=noOfFilePieces-finLength;
 		
 		}
-		System.out.println("Interesting pieces in peer "+nPID+" : "+Arrays.toString(interestingPieces));
+		PeerProcess.getLogger().println("Interesting pieces in peer "+nPID+" : "+Arrays.toString(interestingPieces));
 		for(int i=0; i<noOfFilePieces; i++){
 			if(interestingPieces[i] == true && !requestedPieces.containsKey(i))
 			{

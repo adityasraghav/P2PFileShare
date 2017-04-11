@@ -26,7 +26,7 @@ public class Logger {
 	{
 		boolean toFile = false;
 		if (!toFile) {
-			System.out.println(s);
+			PeerProcess.getLogger().println(s);
 			return;
 		}
 		

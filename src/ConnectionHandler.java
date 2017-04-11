@@ -61,7 +61,7 @@ public class ConnectionHandler extends Thread{
 		} catch (ConnectException e){
 			neighbor.setPeerUp(false);
 		} catch (IOException e) {
-			System.out.println(host.getPeerId()+": Error sending message to "+neighbor.getPeerId());
+			PeerProcess.getLogger().println(host.getPeerId()+": Error sending message to "+neighbor.getPeerId());
 			e.printStackTrace();
 		}
 	}
@@ -77,7 +77,7 @@ public class ConnectionHandler extends Thread{
 				while(true){
 					try {
 						recv = (Message) host_sin.readObject();
-						System.out.println("Received message type: "+ recv.getMsgType() +" from: "+neighbor.getPeerId());
+						PeerProcess.getLogger().println("Received message type: "+ recv.getMsgType() +" from: "+neighbor.getPeerId());
 						if(recv != null){
 							switch (recv.getMsgType()){
 							case UNCHOKE:{
@@ -93,7 +93,7 @@ public class ConnectionHandler extends Thread{
 							case HAVE:{
 								HavePayload have = (HavePayload)(recv.mPayload);
 								FileUtilities.updateBitfield(have.getIndex(),neighbor.getBitfield());
-								System.out.println("Peer "+neighbor.getPeerId()+" contains interesting file pieces");
+								PeerProcess.getLogger().println("Peer "+neighbor.getPeerId()+" contains interesting file pieces");
 								PeerProcess.getLogger().haveRecieved(neighbor.getPeerId(), have.getIndex());
 								//Check whether the piece is interesting and send interested message	
 								if(!FileManager.isInteresting(have.getIndex()))
@@ -122,12 +122,12 @@ public class ConnectionHandler extends Thread{
 								//setting bitfield for the neighboring peer
 								neighbor.setBitfield(in_payload.getBitfield());
 								if(!FileManager.compareBitfields(in_payload.getBitfield(),host.getBitfield() )){
-									System.out.println("Peer "+neighbor.getPeerId()+" does not contain any interesting file pieces");
+									PeerProcess.getLogger().println("Peer "+neighbor.getPeerId()+" does not contain any interesting file pieces");
 									Message notInterested = new Message(MessageType.NOT_INTERESTED,null);
 									sendMessage(notInterested);
 									break;
 								}
-								System.out.println("Peer "+neighbor.getPeerId()+" contains interesting file pieces");
+								PeerProcess.getLogger().println("Peer "+neighbor.getPeerId()+" contains interesting file pieces");
 								Message interested = new Message(MessageType.INTERESTED,null);
 								sendMessage(interested);
 								// No need to add peers that you are interested in.
@@ -156,7 +156,7 @@ public class ConnectionHandler extends Thread{
 					} 
 					catch (ClassNotFoundException | IOException e) {		
 						
-						System.out.println(host.getPeerId()+": Error recieving message from "+neighbor.getPeerId());
+						PeerProcess.getLogger().println(host.getPeerId()+": Error recieving message from "+neighbor.getPeerId());
 						e.printStackTrace();
 					} catch (Exception e){
 						e.printStackTrace();
@@ -170,7 +170,7 @@ public class ConnectionHandler extends Thread{
 			void sendRequest(){
 				int pieceIdx = FileManager.requestPiece(neighbor.getBitfield(), host.getBitfield(),neighbor.getPeerId());
 				if(pieceIdx == -1){
-					System.out.println("No more interesting pieces to request from peer "+neighbor.getPeerId());
+					PeerProcess.getLogger().println("No more interesting pieces to request from peer "+neighbor.getPeerId());
 					return;
 				}
 				Payload requestPayload = new RequestPayload(pieceIdx);
