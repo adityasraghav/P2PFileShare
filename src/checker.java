@@ -1,10 +1,34 @@
 package src;
 
+import java.io.File;
+import java.util.Arrays;
 
 public class checker {
 
 	public static void main(String[] ar){
 		
+//		FileManager fileManager = new FileManager(1001, true);
+//		FileManager fileManager2= new FileManager(1002, false);
+//		
+//		try {
+//			byte [] ss= fileManager.getBitField();
+//			byte [] sv= fileManager2.getBitField();
+//
+//			
+//			while(!fileManager2.hasCompleteFile())
+//			{
+//				int ll = fileManager.requestPiece(ss, sv);
+//				PiecePayload payload= fileManager.get(ll);
+//				fileManager2.store(payload);
+//			}
+//			
+//		} catch (Exception e1) {
+//			// TODO Auto-generated catch block
+//			e1.printStackTrace();
+//		}
+		
+		
+	 	
 		byte b = (byte) 5;
 		
 		

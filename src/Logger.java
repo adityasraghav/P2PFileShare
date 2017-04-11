@@ -22,6 +22,11 @@ public class Logger {
 		}
 	}
 	
+	public void logTest()
+	{
+		System.out.println("Hello World");
+	}
+	
 	//[Time]: Peer [peer_ID 1] <message> [peer_ID 2].
 	
 	public void connect(int ID)

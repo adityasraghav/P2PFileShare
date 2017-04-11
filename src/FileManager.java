@@ -63,6 +63,7 @@ public class FileManager
 	public FileManager(int peerid , boolean has) 
 	{
 		directory = "peer_" + peerid + "/";		
+
 		filePiecesOwned = new boolean[noOfFilePieces];
 		
 		if(has)
@@ -93,7 +94,7 @@ public class FileManager
 				e.printStackTrace();
 			}
 		}	
-		checker();
+
 	}
 	
 	/**
@@ -184,7 +185,7 @@ public class FileManager
 		int finLength;
 		
 		if(size>1)
-			finLength = (noOfFilePieces%(size-1));
+			finLength = (noOfFilePieces%(8));
 		else
 			finLength = noOfFilePieces;
 		
@@ -240,9 +241,9 @@ public class FileManager
 	 * @return true if the file has all the file pieces/complete file
 	 */
 	public static boolean hasCompleteFile(){
-		if(noOfPiecesAvailable < noOfFilePieces)
-			return false;
-		return true;
+		if(noOfPiecesAvailable == noOfFilePieces)
+			return true;
+		return false;
 	}
 	
 	public static void checker(){
@@ -260,14 +261,12 @@ public class FileManager
 							if(!filePiecesOwned[ind])
 								requestedPieces.remove(ind);			
 						}
-					} while (noOfFilePieces<noOfFilePieces);
+					} while (noOfPiecesAvailable<noOfFilePieces);
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
 		}).start();
 
 	}
-	
 }
