@@ -42,7 +42,7 @@ public class FileManager
 	 * @return byte format of the pieces available
 	 * @throws Exception
 	 */
-    public byte[] getBitField() throws Exception {
+    public synchronized static byte[] getBitField() throws Exception {
 
         int size = (int)Math.ceil((double)noOfFilePieces/8);
         byte[] bitfield = new byte[size];

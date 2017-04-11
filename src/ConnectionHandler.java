@@ -6,6 +6,8 @@ import java.io.ObjectOutputStream;
 import java.net.ConnectException;
 import java.net.Socket;
 import java.net.SocketException;
+
+
 /**
  * Contains connection related information between host peer and neighboring peer including object streams
  * to read and write from the connection.
@@ -142,7 +144,10 @@ public class ConnectionHandler extends Thread{
 									// TODO: handle exception
 									e.printStackTrace();
 								}
-								FileUtilities.updateBitfield(((PiecePayload)recv.mPayload).getIndex(),host.getBitfield());
+								
+								
+								
+								host.setBitfield(FileManager.getBitField());
 
 								pHandler.sendHaveAll(((PiecePayload)recv.mPayload).getIndex());
 								piecesDownloaded++;

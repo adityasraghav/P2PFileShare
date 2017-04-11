@@ -143,6 +143,7 @@ public class PeerHandler extends Thread{
 	 * @param p peer to be unchoked
 	 */
 	public void unchokePeer(Peer p){
+		
 		p.unChoke(true);
 		//send unchoke message to peer p
 		Message msgUnchoke = new Message(MessageType.UNCHOKE, null);
