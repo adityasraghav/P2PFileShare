@@ -41,14 +41,14 @@ public class PeerProcess extends Peer implements Runnable{
 	
 	public PeerProcess(String pid, String hName, String portno, String present){
 		super(pid,hName,portno,present);
-		pHandler = new PeerHandler(sSocket, this.getInstance(), peers);
 		logger = new Logger(Integer.parseInt(pid));
+		pHandler = new PeerHandler(sSocket, this.getInstance(), peers);
 	}
 	
 	public PeerProcess(int pid, String hName, int portno, boolean present){
 		super(pid,hName,portno,present);
-		pHandler = new PeerHandler(sSocket, this.getInstance(), peers);
 		logger = new Logger(pid);
+		pHandler = new PeerHandler(sSocket, this.getInstance(), peers);
 	}
 	
 	/**
@@ -67,7 +67,8 @@ public class PeerProcess extends Peer implements Runnable{
 								Socket s = new Socket(pNeighbor.getHostname(), pNeighbor.getPortNo());
 								ObjectOutputStream out = new ObjectOutputStream(s.getOutputStream());
 								out.flush();
-								System.out.println("Handshake Message sent from peer "+getPeerId()+" to peer "+pNeighbor.getPeerId());                    	                   	
+								System.out.println("Handshake Message sent from peer "+getPeerId()+" to peer "+pNeighbor.getPeerId());
+								logger.connect(pNeighbor.getPeerId());
 								out.writeObject(new HandShakeMsg(getPeerId()));
 								out.flush();
 								out.reset();
@@ -132,7 +133,8 @@ public class PeerProcess extends Peer implements Runnable{
 		}
 		System.out.println("Received Handshake Message : "+
 				incoming.getPeerId()+" Header - "+incoming.getHeader());
-
+		logger.connected(incoming.getPeerId());
+		
 		// No need to send Handshake message here again, since all peers will send handshake messages to
 		// neighboring peers in startSender method as well as there is no place we are receiving second handshake
 
