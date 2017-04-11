@@ -39,7 +39,7 @@ public class HandShakeMsg implements Serializable
 	{  
 		ObjectOutputStream ostream = new ObjectOutputStream(out);  			  
 		ostream.writeObject(this);
-		System.out.println("sending handshake message with peer" + this.peerID);
+		PeerProcess.getLogger().println("sending handshake message with peer" + this.peerID);
 	}
 	
 	//return value could be changed to HandShakeMsg if header is also needed
