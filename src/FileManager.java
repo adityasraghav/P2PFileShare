@@ -60,9 +60,11 @@ public class FileManager
         //if(noOfPiecesAvailable == 0)
         //      return null;
 
+        
+        
         int counter = 0;
         for(int i=0;i<noOfFilePieces;i=i+8){
-                bitfield[counter++] = FileUtilities.boolToByte(Arrays.copyOfRange(filePiecesOwned, i, i+8));
+                bitfield[counter++] = FileUtilities.boolToByte(Arrays.copyOfRange(filePiecesOwned, i, (noOfFilePieces> i+8) ? i+8 : noOfFilePieces));
         }
 
         return bitfield;
