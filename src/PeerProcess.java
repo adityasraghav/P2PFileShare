@@ -185,10 +185,10 @@ public class PeerProcess extends Peer implements Runnable{
 	}
 	
 	public static void main(String[] ar){
-		getConfiguration();
+		getConfiguration(ar);
 		System.out.println("Start");
 	}
-	public static void getConfiguration()
+	public static void getConfiguration(String[] ar)
 	{
 		String st;
 		try {
@@ -200,7 +200,7 @@ public class PeerProcess extends Peer implements Runnable{
 					
 			while((st = in.readLine()) != null) {	
 				String[] tokens = st.split("\\s+");
-				if(hostname.equalsIgnoreCase(tokens[1])){
+				if(ar[0].equalsIgnoreCase(tokens[0])){
 					hostPeer = new PeerProcess(tokens[0],tokens[1],tokens[2],tokens[3]);
 				}else{
 					Peer peer = new Peer(tokens[0],tokens[1],tokens[2],tokens[3]);
