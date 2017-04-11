@@ -150,7 +150,7 @@ public class PeerProcess extends Peer implements Runnable{
 		neighbor.setConnHandler(conn);
 
 		//Sending Bitfield message
-		BitfieldPayload out_payload = new BitfieldPayload(fileData.getBitField());
+		BitfieldPayload out_payload = new BitfieldPayload(FileManager.getBitField());
 		conn.sendMessage(new Message(MessageType.BITFIELD, out_payload));
 		System.out.println("Sending Bitfield Message from: "+
 				getPeerId()+" to: "+incoming.getPeerId());
@@ -164,7 +164,7 @@ public class PeerProcess extends Peer implements Runnable{
 		System.out.println("Starting peer "+getPeerId());
 		fileData = new FileManager(getPeerId(), getFilePresent());
 		try {
-			setBitfield(fileData.getBitField());
+			setBitfield(FileManager.getBitField());
 			sSocket = new ServerSocket(this.getPortNo());
 			System.out.println("Server socket created for peer "+getHostname());
 		} catch (Exception e) {
@@ -173,6 +173,7 @@ public class PeerProcess extends Peer implements Runnable{
 		}
 		startServer();
 		startSender();
+		terminator();
 		pHandler.setSocket(sSocket);
 		pHandler.start();
 
@@ -207,8 +208,8 @@ public class PeerProcess extends Peer implements Runnable{
 					int pieces = (int)Math.ceil((double)ConfigParser.getFileSize()/ConfigParser.getPieceSize());
 					while(peerWithFile<end)
 					{
-						Thread.sleep(60000);
-						if(fileData.hasCompleteFile())
+						Thread.sleep(10000);
+						if(FileManager.hasCompleteFile())
 							peerWithFile++;
 						
 						for(Integer ind : temp.keySet())
