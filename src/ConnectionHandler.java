@@ -89,11 +89,11 @@ public class ConnectionHandler extends Thread{
 								break;
 							case HAVE:{
 								HavePayload have = (HavePayload)(recv.mPayload);
-								neighbor.updateBitfield(have.getIndex());
+								FileUtilities.updateBitfield(have.getIndex(),neighbor.getBitfield());
 								System.out.println("Peer "+neighbor.getPeerId()+" contains interesting file pieces");
 
 								//Check whether the piece is interesting and send interested message	
-								if(FileManager.isInteresting(have.getIndex()))
+								if(!FileManager.isInteresting(have.getIndex()))
 								{
 									Message interested = new Message(MessageType.INTERESTED,null);
 									sendMessage(interested);
@@ -137,7 +137,7 @@ public class ConnectionHandler extends Thread{
 									// TODO: handle exception
 									e.printStackTrace();
 								}
-								host.updateBitfield(((PiecePayload)recv.mPayload).getIndex());
+								FileUtilities.updateBitfield(((PiecePayload)recv.mPayload).getIndex(),host.getBitfield());
 
 								pHandler.sendHaveAll(((PiecePayload)recv.mPayload).getIndex());
 								piecesDownloaded++;
@@ -162,7 +162,11 @@ public class ConnectionHandler extends Thread{
 			 * Sends request message with piece index to neighbor
 			 */
 			void sendRequest(){
-				int pieceIdx = FileManager.requestPiece(neighbor.getBitfield(), host.getBitfield());
+				int pieceIdx = FileManager.requestPiece(neighbor.getBitfield(), host.getBitfield(),neighbor.getPeerId());
+				if(pieceIdx == -1){
+					System.out.println("No more interesting pieces to reques from peer "+neighbor.getPeerId());
+					return;
+				}
 				Payload requestPayload = new RequestPayload(pieceIdx);
 				Message msgRequest = new Message(MessageType.REQUEST, requestPayload);
 				try {

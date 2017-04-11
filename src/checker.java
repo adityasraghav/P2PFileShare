@@ -26,7 +26,9 @@ public class checker {
 		}
 		
 		boolean f = FileManager.compareBitfields(l, m);
-		int h = FileManager.requestPiece(l, m);
+		int h = FileManager.requestPiece(l, m,1);
+		
+		FileUtilities.updateBitfield(1, new byte[]{0});
 		
 		System.out.println("check");
 		

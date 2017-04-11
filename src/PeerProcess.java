@@ -149,6 +149,7 @@ public class PeerProcess extends Peer implements Runnable{
     
 	@Override
 	public void run() {
+		System.out.println("Starting peer "+getPeerId());
 		fileData = new FileManager(getPeerId(), getFilePresent());
 		try {
 			setBitfield(fileData.getBitField());
@@ -180,7 +181,6 @@ public class PeerProcess extends Peer implements Runnable{
 	
 	public static void main(String[] ar){
 		getConfiguration();
-		System.out.println("Start");
 	}
 	public static void getConfiguration()
 	{

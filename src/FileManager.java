@@ -29,9 +29,9 @@ public class FileManager
 	/** File pieces available by the peer */
 	private static int noOfPiecesAvailable = 0;
 	
-	private String directory = null;
-	private String fileName = null;
-	private static int fileSize = 0;
+	private static String directory = null;
+	private static String fileName = ConfigParser.getFileName();
+	private static int fileSize = ConfigParser.getFileSize();
 	private static File file = null;
 
 	
@@ -44,34 +44,16 @@ public class FileManager
 	 */
     public byte[] getBitField() throws Exception {
 
-        /*int size = filePiecesOwned.length;
-        BitSet bSet = new BitSet(size);
-
-        for(int i =0;i<size;i++)
-        {
-                if(filePiecesOwned[i])
-                        bSet.set(i);
-                else
-                        bSet.clear(i);
-        }
-        return bSet.toByteArray();*/
         int size = (int)Math.ceil((double)noOfFilePieces/8);
         byte[] bitfield = new byte[size];
-        //if(noOfPiecesAvailable == 0)
-        //      return null;
-
-        
         
         int counter = 0;
         for(int i=0;i<noOfFilePieces;i=i+8){
-                bitfield[counter++] = FileUtilities.boolToByte(Arrays.copyOfRange(filePiecesOwned, i, (noOfFilePieces> i+8) ? i+8 : noOfFilePieces));
+        	bitfield[counter++] = FileUtilities.boolToByte(Arrays.copyOfRange(filePiecesOwned, i, (noOfFilePieces> i+8) ? i+8 : noOfFilePieces));
         }
 
         return bitfield;
-
     }
-	
-	
 
 	/**
 	 * Constructor for the instance of FileManager
@@ -80,9 +62,7 @@ public class FileManager
 	 */
 	public FileManager(int peerid , boolean has) 
 	{
-		directory = "peer_" + peerid + "/";
-		fileName = ConfigParser.getFileName();
-		
+		directory = "peer_" + peerid + "/";		
 		filePiecesOwned = new boolean[noOfFilePieces];
 		
 		if(has)
@@ -142,7 +122,6 @@ public class FileManager
 			return null;
 		}
 	}
-
 	
 	/**
 	 * @param piece The file piece that needs to be added to the file
@@ -197,7 +176,7 @@ public class FileManager
 	 * @param bitfield Host peer's bitfield
 	 * @return
 	 */
-	public static int requestPiece(byte[] neighborBitfield, byte[] bitfield)
+	public static int requestPiece(byte[] neighborBitfield, byte[] bitfield, int nPID)
 	{
 		int size = (int)Math.ceil((double)noOfFilePieces/8);
 		byte[] interesting = new byte[size];
@@ -208,9 +187,8 @@ public class FileManager
 			finLength = (noOfFilePieces%(size-1));
 		else
 			finLength = noOfFilePieces;
-		int start;
-		int end;
 		
+		int start,end;		
 		for(int i=0,j=0;i<bitfield.length;i++){
 			interesting[i] = (byte) ((bitfield[i]^neighborBitfield[i])&neighborBitfield[i]);
 			
@@ -233,7 +211,7 @@ public class FileManager
 				j=noOfFilePieces-finLength;
 		
 		}
-		
+		System.out.println("Interesting pieces in peer "+nPID+" : "+Arrays.toString(interestingPieces));
 		for(int i=0; i<noOfFilePieces; i++){
 			if(interestingPieces[i] == true && !requestedPieces.containsKey(i))
 			{
@@ -241,7 +219,6 @@ public class FileManager
 				return i;
 			}
 		}
-		// TODO make it fail safe
 		return -1;
 	}
 	

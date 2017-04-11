@@ -1,6 +1,7 @@
 package src;
 
 import java.net.Socket;
+import java.util.Arrays;
 
 /**
  * This stores peer information, each peer object created will correspond to some entry in configuration file
@@ -103,17 +104,6 @@ public class Peer {
 		this.setFilePresent(present);
 	}
 	
-	/**
-	 * Updates bitfield of a Peer on receiving have message
-	 * @param index
-	 */
-	public void updateBitfield(long index){
-		int i = (int)(index/8);
-		int u = (int)(index%8);
-		byte update = 1;
-		update = (byte)(update << u-1);
-		bitfield[i] = (byte)(bitfield[i]&update);
-	}
 	/**
 	 * @return the hostSocket
 	 */
