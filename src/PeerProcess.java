@@ -222,7 +222,6 @@ public class PeerProcess extends Peer implements Runnable{
 								Peer peer = temp.get(ind);
 								if(FileUtilities.checkComplete(peer.getBitfield(),pieces))
 								{
-									temp.remove(ind);
 									peerWithFile++;
 								}
 								
