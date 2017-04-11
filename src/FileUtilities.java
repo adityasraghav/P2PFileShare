@@ -68,7 +68,7 @@ public class FileUtilities {
 		int start,end;		
 		for(int i=0,j=0;i<bitfield.length;i++)
 		{
-			if(i==size-1)
+			if(i==bitfield.length-1)
 			{
 				start = 8-finLength; 
 				end = finLength;

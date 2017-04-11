@@ -27,8 +27,25 @@ public class checker {
 //			e1.printStackTrace();
 //		}
 		
+		try {
+	 	boolean [] tester= new boolean[19];
+	 	Arrays.fill(tester, true);
+	 	byte [] bbs=new byte[3];
+	 	int counter = 0;
+        for(int i=0;i<19;i=i+8){
+        	
+				bbs[counter++] = FileUtilities.boolToByte(Arrays.copyOfRange(tester, i, (19> i+8) ? i+8 : 19));
+			
+        }
+        
+        boolean bla= FileUtilities.checkComplete(bbs, 19);
+        
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
-	 	
+		
 		byte b = (byte) 5;
 		
 		
