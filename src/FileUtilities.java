@@ -51,8 +51,6 @@ public class FileUtilities {
 		int u = (int)(index%8);
 		byte update = 1;
 		update = (byte)(update << u);
-		System.out.println("Bitfield with index "+u+" in bitfield before update "+Arrays.toString(FileUtilities.byteToBoolean(bitfield[i])));
 		bitfield[i] = (byte)(bitfield[i]|update);
-		System.out.println("Update bitfield with index "+u+" in bitfield "+Arrays.toString(FileUtilities.byteToBoolean(bitfield[i])));
 	}
 }

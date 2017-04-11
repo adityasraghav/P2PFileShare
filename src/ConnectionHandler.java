@@ -79,7 +79,7 @@ public class ConnectionHandler extends Thread{
 				while(true){
 					try {
 						recv = (Message) host_sin.readObject();
-						System.out.println("Received message type: "+ recv.getMsgType() +"from: "+neighbor.getPeerId());
+						System.out.println("Received message type: "+ recv.getMsgType() +" from: "+neighbor.getPeerId());
 						if(recv != null){
 							switch (recv.getMsgType()){
 							case UNCHOKE:{
@@ -170,7 +170,7 @@ public class ConnectionHandler extends Thread{
 			void sendRequest(){
 				int pieceIdx = FileManager.requestPiece(neighbor.getBitfield(), host.getBitfield(),neighbor.getPeerId());
 				if(pieceIdx == -1){
-					System.out.println("No more interesting pieces to reques from peer "+neighbor.getPeerId());
+					System.out.println("No more interesting pieces to request from peer "+neighbor.getPeerId());
 					return;
 				}
 				Payload requestPayload = new RequestPayload(pieceIdx);
