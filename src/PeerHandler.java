@@ -24,12 +24,17 @@ public class PeerHandler extends Thread{
 	
 	private Peer hostPeer;
 	
-	public PeerHandler(){}
+	private Logger logger;
+	
+	public PeerHandler(){
+		logger = new Logger(0);
+	}
 	
 	public PeerHandler(ServerSocket s, Peer host, HashMap<Integer,Peer> prs){
 		sSocket = s;
 		hostPeer = host;
 		peers = prs;
+		logger = new Logger(host.getPeerId());
 	}
 	
 	public void add(Peer i){
@@ -78,6 +83,11 @@ public class PeerHandler extends Thread{
 									kPeers.add(p);
 									unchokePeer(p);
 								}
+								ArrayList<Integer> preferredPeers = new ArrayList<Integer>();
+								for (int i = 0; i < kPeers.size(); i ++) {
+									preferredPeers.add(kPeers.get(i).getPeerId());
+								}
+								logger.preferredNeighbors(preferredPeers);
 								chokePeers();
 							}
 							Thread.sleep(timeout);
