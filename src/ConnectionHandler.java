@@ -84,10 +84,12 @@ public class ConnectionHandler extends Thread{
 							switch (recv.getMsgType()){
 							case UNCHOKE:{
 								flagUnchoke = true;
+								logger.unchoked(neighbor.getPeerId());
 								sendRequest();
 								break;}
 							case CHOKE:
 								//TODO stop sending file pieces
+								logger.choked(neighbor.getPeerId());
 								flagUnchoke = false;
 								break;
 							case HAVE:{
@@ -143,7 +145,7 @@ public class ConnectionHandler extends Thread{
 									e.printStackTrace();
 								}
 								FileUtilities.updateBitfield(((PiecePayload)recv.mPayload).getIndex(),host.getBitfield());
-
+								
 								pHandler.sendHaveAll(((PiecePayload)recv.mPayload).getIndex());
 								piecesDownloaded++;
 								logger.downloading(neighbor.getPeerId(), ((PiecePayload)recv.mPayload).getIndex(), piecesDownloaded);

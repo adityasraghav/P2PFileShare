@@ -147,8 +147,6 @@ public class PeerHandler extends Thread{
 		//send unchoke message to peer p
 		Message msgUnchoke = new Message(MessageType.UNCHOKE, null);
 		p.getConn().sendMessage(msgUnchoke);
-		// log here or after receiving the message
-		logger.unchoked(p.getPeerId());
 	}
 	
 	/**
@@ -165,7 +163,6 @@ public class PeerHandler extends Thread{
 				Message chokeMsg = new Message(MessageType.CHOKE, null);
 				temp.getConn().sendMessage(chokeMsg);
 				// TODO call method to stop sending data to neighbor
-				logger.choked(temp.getPeerId());
 			}
 		}
 	}
