@@ -160,7 +160,6 @@ public class PeerProcess extends Peer implements Runnable{
     
 	@Override
 	public void run() {
-		while(runner){
 		System.out.println("Starting peer "+getPeerId());
 		fileData = new FileManager(getPeerId(), getFilePresent());
 		try {
@@ -190,7 +189,13 @@ public class PeerProcess extends Peer implements Runnable{
 				}
 			}
 		}));
+		
+		while(runner)
+		{
+			
 		}
+		System.out.println("Shutting Down");
+		System.exit(0);
 	}
 	
 	public void terminator(){
