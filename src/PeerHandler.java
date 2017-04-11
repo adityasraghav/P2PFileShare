@@ -24,12 +24,17 @@ public class PeerHandler extends Thread{
 	
 	private Peer hostPeer;
 	
-	public PeerHandler(){}
+	private Logger logger;
+	
+	public PeerHandler(){
+		logger = new Logger(0);
+	}
 	
 	public PeerHandler(ServerSocket s, Peer host, HashMap<Integer,Peer> prs){
 		sSocket = s;
 		hostPeer = host;
 		peers = prs;
+		logger = new Logger(host.getPeerId());
 	}
 	
 	public void add(Peer i){
@@ -78,6 +83,11 @@ public class PeerHandler extends Thread{
 									kPeers.add(p);
 									unchokePeer(p);
 								}
+								ArrayList<Integer> preferredPeers = new ArrayList<Integer>();
+								for (int i = 0; i < kPeers.size(); i ++) {
+									preferredPeers.add(kPeers.get(i).getPeerId());
+								}
+								logger.preferredNeighbors(preferredPeers);
 								chokePeers();
 							}
 							Thread.sleep(timeout);
@@ -113,6 +123,7 @@ public class PeerHandler extends Thread{
 								}while(!p.isUnchoked()); //need to review this condition
 								optUnchokedPeer = p;
 								unchokePeer(p);
+								logger.optUnchoke(p.getPeerId());
 							}
 							Thread.sleep(timeout);
 						}while(!sSocket.isClosed());
@@ -135,6 +146,8 @@ public class PeerHandler extends Thread{
 		//send unchoke message to peer p
 		Message msgUnchoke = new Message(MessageType.UNCHOKE, null);
 		p.getConn().sendMessage(msgUnchoke);
+		// log here or after receiving the message
+		logger.unchoked(p.getPeerId());
 	}
 	
 	/**
@@ -151,6 +164,7 @@ public class PeerHandler extends Thread{
 				Message chokeMsg = new Message(MessageType.CHOKE, null);
 				temp.getConn().sendMessage(chokeMsg);
 				// TODO call method to stop sending data to neighbor
+				logger.choked(temp.getPeerId());
 			}
 		}
 	}

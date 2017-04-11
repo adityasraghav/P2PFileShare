@@ -31,6 +31,8 @@ public class ConnectionHandler extends Thread{
 	
 	private PeerHandler pHandler;
 	
+	private Logger logger;
+	
 	public ConnectionHandler(){}
 	
 	public ConnectionHandler(Peer h, Peer n, ObjectInputStream i, ObjectOutputStream o, Socket s, PeerHandler p) throws IOException{
@@ -42,6 +44,7 @@ public class ConnectionHandler extends Thread{
 		pHandler = p;
 		piecesDownloaded = 0;
 		host_sin = new ObjectInputStream(n.getHostSocket().getInputStream());
+		logger = new Logger(h.getPeerId());
 	}
 	
 	/*public void setSocket(Socket s){
@@ -91,7 +94,7 @@ public class ConnectionHandler extends Thread{
 								HavePayload have = (HavePayload)(recv.mPayload);
 								neighbor.updateBitfield(have.getIndex());
 								System.out.println("Peer "+neighbor.getPeerId()+" contains interesting file pieces");
-
+								logger.haveRecieved(neighbor.getPeerId(), have.getIndex());
 								//Check whether the piece is interesting and send interested message	
 								if(FileManager.isInteresting(have.getIndex()))
 								{
@@ -108,9 +111,11 @@ public class ConnectionHandler extends Thread{
 								break;}
 							case INTERESTED:
 								pHandler.add(neighbor);
+								logger.intRecieved(neighbor.getPeerId());
 								break;
 							case NOT_INTERESTED:
 								pHandler.remove(neighbor);
+								logger.notIntRecieved(neighbor.getPeerId());
 								break;
 							case BITFIELD:{
 								BitfieldPayload in_payload = (BitfieldPayload)(recv.mPayload);
@@ -141,6 +146,7 @@ public class ConnectionHandler extends Thread{
 
 								pHandler.sendHaveAll(((PiecePayload)recv.mPayload).getIndex());
 								piecesDownloaded++;
+								logger.downloading(neighbor.getPeerId(), ((PiecePayload)recv.mPayload).getIndex(), piecesDownloaded);
 								if(flagUnchoke)sendRequest();
 								break;}
 							}
