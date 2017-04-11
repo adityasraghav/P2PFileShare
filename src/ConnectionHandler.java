@@ -146,6 +146,7 @@ public class ConnectionHandler extends Thread{
 
 								pHandler.sendHaveAll(((PiecePayload)recv.mPayload).getIndex());
 								piecesDownloaded++;
+								logger.downloading(neighbor.getPeerId(), ((PiecePayload)recv.mPayload).getIndex(), piecesDownloaded);
 								if(flagUnchoke)sendRequest();
 								break;}
 							}
