@@ -82,6 +82,8 @@ public class FileManager
 	{
 		directory = "peer_" + peerid + "/";
 		fileName = ConfigParser.getFileName();
+		fileSize = ConfigParser.getFileSize();
+		noOfPiecesAvailable = 0;
 		
 		filePiecesOwned = new boolean[noOfFilePieces];
 		
@@ -113,7 +115,7 @@ public class FileManager
 				e.printStackTrace();
 			}
 		}	
-		checker();
+
 	}
 	
 	/**
@@ -205,7 +207,7 @@ public class FileManager
 		int finLength;
 		
 		if(size>1)
-			finLength = (noOfFilePieces%(size-1));
+			finLength = (noOfFilePieces%(8));
 		else
 			finLength = noOfFilePieces;
 		int start;
@@ -241,7 +243,6 @@ public class FileManager
 				return i;
 			}
 		}
-		// TODO make it fail safe
 		return -1;
 	}
 	
@@ -262,10 +263,10 @@ public class FileManager
 	/**
 	 * @return true if the file has all the file pieces/complete file
 	 */
-	public static boolean hasCompleteFile(){
-		if(noOfPiecesAvailable < noOfFilePieces)
-			return false;
-		return true;
+	public boolean hasCompleteFile(){
+		if(noOfPiecesAvailable == noOfFilePieces)
+			return true;
+		return false;
 	}
 	
 	public static void checker(){
@@ -283,14 +284,12 @@ public class FileManager
 							if(!filePiecesOwned[ind])
 								requestedPieces.remove(ind);			
 						}
-					} while (noOfFilePieces<noOfFilePieces);
+					} while (noOfPiecesAvailable<noOfFilePieces);
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
 		}).start();
 
 	}
-	
 }
