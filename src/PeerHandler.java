@@ -24,17 +24,12 @@ public class PeerHandler extends Thread{
 	
 	private Peer hostPeer;
 	
-	private Logger logger;
-	
-	public PeerHandler(){
-		logger = new Logger(0);
-	}
+	public PeerHandler(){}
 	
 	public PeerHandler(ServerSocket s, Peer host, HashMap<Integer,Peer> prs){
 		sSocket = s;
 		hostPeer = host;
 		peers = prs;
-		logger = new Logger(host.getPeerId());
 	}
 	
 	public void add(Peer i){
@@ -88,7 +83,7 @@ public class PeerHandler extends Thread{
 								for (int i = 0; i < kPeers.size(); i ++) {
 									preferredPeers.add(kPeers.get(i).getPeerId());
 								}
-								logger.preferredNeighbors(preferredPeers);
+								PeerProcess.getLogger().preferredNeighbors(preferredPeers);
 								chokePeers();
 							}
 							Thread.sleep(timeout);
@@ -124,7 +119,7 @@ public class PeerHandler extends Thread{
 								}while(!p.isUnchoked()); //need to review this condition
 								optUnchokedPeer = p;
 								unchokePeer(p);
-								logger.optUnchoke(p.getPeerId());
+								PeerProcess.getLogger().optUnchoke(p.getPeerId());
 							}
 							Thread.sleep(timeout);
 						}while(!sSocket.isClosed());

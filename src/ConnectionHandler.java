@@ -31,9 +31,8 @@ public class ConnectionHandler extends Thread{
 	
 	private PeerHandler pHandler;
 	
-	private Logger logger;
-	
-	public ConnectionHandler(){}
+	public ConnectionHandler(){
+	}
 	
 	public ConnectionHandler(Peer h, Peer n, ObjectInputStream i, ObjectOutputStream o, Socket s, PeerHandler p) throws IOException{
 		host = h;
@@ -44,7 +43,6 @@ public class ConnectionHandler extends Thread{
 		pHandler = p;
 		piecesDownloaded = 0;
 		host_sin = new ObjectInputStream(n.getHostSocket().getInputStream());
-		logger = new Logger(h.getPeerId());
 	}
 	
 	/*public void setSocket(Socket s){
@@ -84,19 +82,19 @@ public class ConnectionHandler extends Thread{
 							switch (recv.getMsgType()){
 							case UNCHOKE:{
 								flagUnchoke = true;
-								logger.unchoked(neighbor.getPeerId());
+								PeerProcess.getLogger().unchoked(neighbor.getPeerId());
 								sendRequest();
 								break;}
 							case CHOKE:
 								//TODO stop sending file pieces
-								logger.choked(neighbor.getPeerId());
+								PeerProcess.getLogger().choked(neighbor.getPeerId());
 								flagUnchoke = false;
 								break;
 							case HAVE:{
 								HavePayload have = (HavePayload)(recv.mPayload);
 								FileUtilities.updateBitfield(have.getIndex(),neighbor.getBitfield());
 								System.out.println("Peer "+neighbor.getPeerId()+" contains interesting file pieces");
-								logger.haveRecieved(neighbor.getPeerId(), have.getIndex());
+								PeerProcess.getLogger().haveRecieved(neighbor.getPeerId(), have.getIndex());
 								//Check whether the piece is interesting and send interested message	
 								if(!FileManager.isInteresting(have.getIndex()))
 								{
@@ -113,11 +111,11 @@ public class ConnectionHandler extends Thread{
 								break;}
 							case INTERESTED:
 								pHandler.add(neighbor);
-								logger.intRecieved(neighbor.getPeerId());
+								PeerProcess.getLogger().intRecieved(neighbor.getPeerId());
 								break;
 							case NOT_INTERESTED:
 								pHandler.remove(neighbor);
-								logger.notIntRecieved(neighbor.getPeerId());
+								PeerProcess.getLogger().notIntRecieved(neighbor.getPeerId());
 								break;
 							case BITFIELD:{
 								BitfieldPayload in_payload = (BitfieldPayload)(recv.mPayload);
@@ -148,7 +146,7 @@ public class ConnectionHandler extends Thread{
 								
 								pHandler.sendHaveAll(((PiecePayload)recv.mPayload).getIndex());
 								piecesDownloaded++;
-								logger.downloading(neighbor.getPeerId(), ((PiecePayload)recv.mPayload).getIndex(), piecesDownloaded);
+								PeerProcess.getLogger().downloading(neighbor.getPeerId(), ((PiecePayload)recv.mPayload).getIndex(), piecesDownloaded);
 								if(flagUnchoke)sendRequest();
 								break;}
 							}
