@@ -22,11 +22,23 @@ public class Logger {
 		}
 	}
 	
-	public void logTest()
+	public void println(String s) 
 	{
-		System.out.println("Hello World");
+		boolean toFile = false;
+		if (!toFile) {
+			System.out.println(s);
+			return;
+		}
+		
+		try 
+		{
+			logfile.println(time.format(new Date()) + ": " + s);
+			logfile.flush();
+		}catch(Exception e) 
+		{
+			e.printStackTrace();
+		}
 	}
-	
 	//[Time]: Peer [peer_ID 1] <message> [peer_ID 2].
 	
 	public void connect(int ID)
