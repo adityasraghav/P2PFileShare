@@ -171,4 +171,15 @@ public class Logger {
 			e.printStackTrace();
 		}
 	}
+	
+	public void logMessage(String message){
+		try
+		{
+			logfile.println(time.format(new Date()) +": Peer " + peerID +" "+ message );
+			logfile.flush();
+		}catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
 }
