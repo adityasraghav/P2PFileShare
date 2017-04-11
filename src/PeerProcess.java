@@ -37,7 +37,7 @@ public class PeerProcess extends Peer implements Runnable{
 	
 	private FileManager fileData;
 	
-	private static Logger logger;
+	private Logger logger;
 	
 	public PeerProcess(String pid, String hName, String portno, String present){
 		super(pid,hName,portno,present);
@@ -49,10 +49,6 @@ public class PeerProcess extends Peer implements Runnable{
 		super(pid,hName,portno,present);
 		logger = new Logger(pid);
 		pHandler = new PeerHandler(sSocket, this.getInstance(), peers);
-	}
-	
-	public static Logger getLogger() {
-		return logger;
 	}
 	
 	/**
@@ -71,7 +67,7 @@ public class PeerProcess extends Peer implements Runnable{
 								Socket s = new Socket(pNeighbor.getHostname(), pNeighbor.getPortNo());
 								ObjectOutputStream out = new ObjectOutputStream(s.getOutputStream());
 								out.flush();
-								PeerProcess.getLogger().println("Handshake Message sent from peer "+getPeerId()+" to peer "+pNeighbor.getPeerId());
+								System.out.println("Handshake Message sent from peer "+getPeerId()+" to peer "+pNeighbor.getPeerId());
 								logger.connect(pNeighbor.getPeerId());
 								out.writeObject(new HandShakeMsg(getPeerId()));
 								out.flush();
@@ -84,7 +80,7 @@ public class PeerProcess extends Peer implements Runnable{
 					} catch (UnknownHostException e) {
 						e.printStackTrace();
 					} catch (ConnectException e) {
-						//PeerProcess.getLogger().println("Peer not accepting connections");
+						//System.out.println("Peer not accepting connections");
 					} catch (IOException e) {
 						e.printStackTrace();
 					} catch (Exception e){
@@ -133,9 +129,9 @@ public class PeerProcess extends Peer implements Runnable{
 		//Receiving Handshake message
 		HandShakeMsg incoming = (HandShakeMsg)in.readObject();
 		if(peers.get(incoming.getPeerId()) == null || !incoming.getHeader().equals(HandShakeMsg.Header)){
-			PeerProcess.getLogger().println("Error performing Handshake : PeerId or Header unknown");
+			System.out.println("Error performing Handshake : PeerId or Header unknown");
 		}
-		PeerProcess.getLogger().println("Received Handshake Message : "+
+		System.out.println("Received Handshake Message : "+
 				incoming.getPeerId()+" Header - "+incoming.getHeader());
 		logger.connected(incoming.getPeerId());
 		
@@ -151,7 +147,7 @@ public class PeerProcess extends Peer implements Runnable{
 		//Sending Bitfield message
 		BitfieldPayload out_payload = new BitfieldPayload(fileData.getBitField());
 		conn.sendMessage(new Message(MessageType.BITFIELD, out_payload));
-		PeerProcess.getLogger().println("Sending Bitfield Message from: "+
+		System.out.println("Sending Bitfield Message from: "+
 				getPeerId()+" to: "+incoming.getPeerId());
 
 		return conn;
@@ -159,14 +155,14 @@ public class PeerProcess extends Peer implements Runnable{
     
 	@Override
 	public void run() {
-		PeerProcess.getLogger().println("Starting peer "+getPeerId());
+		System.out.println("Starting peer "+getPeerId());
 		fileData = new FileManager(getPeerId(), getFilePresent());
 		try {
 			setBitfield(fileData.getBitField());
 			sSocket = new ServerSocket(this.getPortNo());
-			PeerProcess.getLogger().println("Server socket created for peer "+getHostname());
+			System.out.println("Server socket created for peer "+getHostname());
 		} catch (Exception e) {
-			PeerProcess.getLogger().println("Error opening socket");
+			System.out.println("Error opening socket");
 			e.printStackTrace();
 		}
 		startServer();
@@ -182,7 +178,7 @@ public class PeerProcess extends Peer implements Runnable{
 						p.getHostSocket().close();
 					}
 				} catch (IOException e) {
-					PeerProcess.getLogger().println("Error closing socket of peer "+getPeerId());
+					System.out.println("Error closing socket of peer "+getPeerId());
 					e.printStackTrace();
 				}
 			}

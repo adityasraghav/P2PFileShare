@@ -54,7 +54,8 @@ public class checker {
 		
 		FileUtilities.updateBitfield(1, new byte[]{0});
 		
-		PeerProcess.getLogger().println("check");
+		System.out.println("check");
+		
 	}
 	
 	

@@ -22,23 +22,11 @@ public class Logger {
 		}
 	}
 	
-	public void println(String s) 
+	public void logTest()
 	{
-		boolean toFile = false;
-		if (!toFile) {
-			PeerProcess.getLogger().println(s);
-			return;
-		}
-		
-		try 
-		{
-			logfile.println(time.format(new Date()) + ": " + s);
-			logfile.flush();
-		}catch(Exception e) 
-		{
-			e.printStackTrace();
-		}
+		System.out.println("Hello World");
 	}
+	
 	//[Time]: Peer [peer_ID 1] <message> [peer_ID 2].
 	
 	public void connect(int ID)
@@ -165,17 +153,6 @@ public class Logger {
 		try
 		{
 			logfile.println(time.format(new Date()) +": Peer " + peerID + " has downloaded the complete file." );
-			logfile.flush();
-		}catch(Exception e)
-		{
-			e.printStackTrace();
-		}
-	}
-	
-	public void logMessage(String message){
-		try
-		{
-			logfile.println(time.format(new Date()) +": Peer " + peerID +" "+ message );
 			logfile.flush();
 		}catch(Exception e)
 		{

@@ -33,8 +33,9 @@ public class ConnectionHandler extends Thread{
 	
 	private PeerHandler pHandler;
 	
-	public ConnectionHandler(){
-	}
+	private Logger logger;
+	
+	public ConnectionHandler(){}
 	
 	public ConnectionHandler(Peer h, Peer n, ObjectInputStream i, ObjectOutputStream o, Socket s, PeerHandler p) throws IOException{
 		host = h;
@@ -45,6 +46,7 @@ public class ConnectionHandler extends Thread{
 		pHandler = p;
 		piecesDownloaded = 0;
 		host_sin = new ObjectInputStream(n.getHostSocket().getInputStream());
+		logger = new Logger(h.getPeerId());
 	}
 	
 	/*public void setSocket(Socket s){
@@ -63,7 +65,7 @@ public class ConnectionHandler extends Thread{
 		} catch (ConnectException e){
 			neighbor.setPeerUp(false);
 		} catch (IOException e) {
-			PeerProcess.getLogger().println(host.getPeerId()+": Error sending message to "+neighbor.getPeerId());
+			System.out.println(host.getPeerId()+": Error sending message to "+neighbor.getPeerId());
 			e.printStackTrace();
 		}
 	}
@@ -79,24 +81,22 @@ public class ConnectionHandler extends Thread{
 				while(true){
 					try {
 						recv = (Message) host_sin.readObject();
-						PeerProcess.getLogger().println("Received message type: "+ recv.getMsgType() +" from: "+neighbor.getPeerId());
+						System.out.println("Received message type: "+ recv.getMsgType() +" from: "+neighbor.getPeerId());
 						if(recv != null){
 							switch (recv.getMsgType()){
 							case UNCHOKE:{
 								flagUnchoke = true;
-								PeerProcess.getLogger().unchoked(neighbor.getPeerId());
 								sendRequest();
 								break;}
 							case CHOKE:
 								//TODO stop sending file pieces
-								PeerProcess.getLogger().choked(neighbor.getPeerId());
 								flagUnchoke = false;
 								break;
 							case HAVE:{
 								HavePayload have = (HavePayload)(recv.mPayload);
 								FileUtilities.updateBitfield(have.getIndex(),neighbor.getBitfield());
-								PeerProcess.getLogger().println("Peer "+neighbor.getPeerId()+" contains interesting file pieces");
-								PeerProcess.getLogger().haveRecieved(neighbor.getPeerId(), have.getIndex());
+								System.out.println("Peer "+neighbor.getPeerId()+" contains interesting file pieces");
+								logger.haveRecieved(neighbor.getPeerId(), have.getIndex());
 								//Check whether the piece is interesting and send interested message	
 								if(!FileManager.isInteresting(have.getIndex()))
 								{
@@ -113,23 +113,23 @@ public class ConnectionHandler extends Thread{
 								break;}
 							case INTERESTED:
 								pHandler.add(neighbor);
-								PeerProcess.getLogger().intRecieved(neighbor.getPeerId());
+								logger.intRecieved(neighbor.getPeerId());
 								break;
 							case NOT_INTERESTED:
 								pHandler.remove(neighbor);
-								PeerProcess.getLogger().notIntRecieved(neighbor.getPeerId());
+								logger.notIntRecieved(neighbor.getPeerId());
 								break;
 							case BITFIELD:{
 								BitfieldPayload in_payload = (BitfieldPayload)(recv.mPayload);
 								//setting bitfield for the neighboring peer
 								neighbor.setBitfield(in_payload.getBitfield());
 								if(!FileManager.compareBitfields(in_payload.getBitfield(),host.getBitfield() )){
-									PeerProcess.getLogger().println("Peer "+neighbor.getPeerId()+" does not contain any interesting file pieces");
+									System.out.println("Peer "+neighbor.getPeerId()+" does not contain any interesting file pieces");
 									Message notInterested = new Message(MessageType.NOT_INTERESTED,null);
 									sendMessage(notInterested);
 									break;
 								}
-								PeerProcess.getLogger().println("Peer "+neighbor.getPeerId()+" contains interesting file pieces");
+								System.out.println("Peer "+neighbor.getPeerId()+" contains interesting file pieces");
 								Message interested = new Message(MessageType.INTERESTED,null);
 								sendMessage(interested);
 								// No need to add peers that you are interested in.
@@ -144,11 +144,14 @@ public class ConnectionHandler extends Thread{
 									// TODO: handle exception
 									e.printStackTrace();
 								}
+								
+								
+								
 								host.setBitfield(FileManager.getBitField());
 
 								pHandler.sendHaveAll(((PiecePayload)recv.mPayload).getIndex());
 								piecesDownloaded++;
-								PeerProcess.getLogger().downloading(neighbor.getPeerId(), ((PiecePayload)recv.mPayload).getIndex(), piecesDownloaded);
+								logger.downloading(neighbor.getPeerId(), ((PiecePayload)recv.mPayload).getIndex(), piecesDownloaded);
 								if(flagUnchoke)sendRequest();
 								break;}
 							}
@@ -158,7 +161,7 @@ public class ConnectionHandler extends Thread{
 					} 
 					catch (ClassNotFoundException | IOException e) {		
 						
-						PeerProcess.getLogger().println(host.getPeerId()+": Error recieving message from "+neighbor.getPeerId());
+						System.out.println(host.getPeerId()+": Error recieving message from "+neighbor.getPeerId());
 						e.printStackTrace();
 					} catch (Exception e){
 						e.printStackTrace();
@@ -172,7 +175,7 @@ public class ConnectionHandler extends Thread{
 			void sendRequest(){
 				int pieceIdx = FileManager.requestPiece(neighbor.getBitfield(), host.getBitfield(),neighbor.getPeerId());
 				if(pieceIdx == -1){
-					PeerProcess.getLogger().println("No more interesting pieces to request from peer "+neighbor.getPeerId());
+					System.out.println("No more interesting pieces to request from peer "+neighbor.getPeerId());
 					return;
 				}
 				Payload requestPayload = new RequestPayload(pieceIdx);
