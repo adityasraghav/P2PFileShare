@@ -37,14 +37,18 @@ public class PeerProcess extends Peer implements Runnable{
 	
 	private FileManager fileData;
 	
+	private Logger logger;
+	
 	public PeerProcess(String pid, String hName, String portno, String present){
 		super(pid,hName,portno,present);
 		pHandler = new PeerHandler(sSocket, this.getInstance(), peers);
+		logger = new Logger(Integer.parseInt(pid));
 	}
 	
 	public PeerProcess(int pid, String hName, int portno, boolean present){
 		super(pid,hName,portno,present);
 		pHandler = new PeerHandler(sSocket, this.getInstance(), peers);
+		logger = new Logger(pid);
 	}
 	
 	/**
