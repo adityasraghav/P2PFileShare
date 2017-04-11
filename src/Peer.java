@@ -18,9 +18,22 @@ public class Peer {
 	private long downloadSpeed;
 	private ConnectionHandler conn;
 	private Socket hostSocket;
+	private boolean peerUp;
 	
 	public int getPeerId() {
 		return peerId;
+	}
+	/**
+	 * @return the peerUp
+	 */
+	public boolean isPeerUp() {
+		return peerUp;
+	}
+	/**
+	 * @param peerUp the peerUp to set
+	 */
+	public void setPeerUp(boolean peerUp) {
+		this.peerUp = peerUp;
 	}
 	public void setPeerId(int peerId) {
 		this.peerId = peerId;

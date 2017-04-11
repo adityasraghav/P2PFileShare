@@ -3,6 +3,7 @@ package src;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.ConnectException;
 import java.net.Socket;
 /**
  * Contains connection related information between host peer and neighboring peer including object streams
@@ -55,6 +56,8 @@ public class ConnectionHandler extends Thread{
 			sout.writeObject(msg);
 			sout.reset();
 			sout.flush();
+		} catch (ConnectException e){
+			neighbor.setPeerUp(false);
 		} catch (IOException e) {
 			System.out.println(host.getPeerId()+": Error sending message to "+neighbor.getPeerId());
 			e.printStackTrace();

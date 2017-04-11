@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.ConnectException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -51,25 +52,38 @@ public class PeerProcess extends Peer implements Runnable{
 	 * handshake messages to neighboring peers to check their bitfields, essentially broadcasting handshake messages
 	 */
 	public void startSender() {
-		
-		try {
-			//Sending Handshake message to all other peers
-			for (Peer pNeighbor : peers.values()){
-				Socket s = new Socket(pNeighbor.getHostname(), pNeighbor.getPortNo());
-				ObjectOutputStream out = new ObjectOutputStream(s.getOutputStream());
-				out.flush();
-				System.out.println("Handshake Message sent from peer "+getPeerId()+" to peer "+pNeighbor.getPeerId());                    	                   	
-				out.writeObject(new HandShakeMsg(getPeerId()));
-				out.flush();
-				pNeighbor.setHostSocket(s);				
+		long timeout = 60000;
+		new Thread(){
+			public void run(){
+				while(true){
+					try {
+						//Sending Handshake message to all other peers
+						for (Peer pNeighbor : peers.values()){
+							if(!pNeighbor.isPeerUp()){
+								Socket s = new Socket(pNeighbor.getHostname(), pNeighbor.getPortNo());
+								ObjectOutputStream out = new ObjectOutputStream(s.getOutputStream());
+								out.flush();
+								System.out.println("Handshake Message sent from peer "+getPeerId()+" to peer "+pNeighbor.getPeerId());                    	                   	
+								out.writeObject(new HandShakeMsg(getPeerId()));
+								out.flush();
+								out.reset();
+								pNeighbor.setHostSocket(s);
+								pNeighbor.setPeerUp(true);
+							}
+						}
+						Thread.sleep(timeout);
+					} catch (UnknownHostException e) {
+						e.printStackTrace();
+					} catch (ConnectException e) {
+						//System.out.println("Peer not accepting connections");
+					} catch (IOException e) {
+						e.printStackTrace();
+					} catch (Exception e){
+						e.printStackTrace();
+					}
+				}
 			}
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (Exception e){
-			e.printStackTrace();
-		}
+		}.start();
 	}
 
 	/**
@@ -103,8 +117,9 @@ public class PeerProcess extends Peer implements Runnable{
 	public ConnectionHandler establishConnection() throws Exception{
 
 		Socket lSocket = sSocket.accept();
-		ObjectInputStream in = new ObjectInputStream(lSocket.getInputStream());
 		ObjectOutputStream out = new ObjectOutputStream(lSocket.getOutputStream());
+		out.flush();
+		ObjectInputStream in = new ObjectInputStream(lSocket.getInputStream());
 
 		//Receiving Handshake message
 		HandShakeMsg incoming = (HandShakeMsg)in.readObject();
@@ -138,6 +153,7 @@ public class PeerProcess extends Peer implements Runnable{
 		try {
 			setBitfield(fileData.getBitField());
 			sSocket = new ServerSocket(this.getPortNo());
+			System.out.println("Server socket created for peer "+getHostname());
 		} catch (Exception e) {
 			System.out.println("Error opening socket");
 			e.printStackTrace();
