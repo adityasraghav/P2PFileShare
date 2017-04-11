@@ -81,7 +81,8 @@ public class PeerHandler extends Thread{
 									// chooses peer adds it to k preferred peers list and unchokes them
 									p.getConn().resetPiecesDownloaded();
 									kPeers.add(p);
-									unchokePeer(p);
+									if(!p.isUnchoked())
+										unchokePeer(p);
 								}
 								ArrayList<Integer> preferredPeers = new ArrayList<Integer>();
 								for (int i = 0; i < kPeers.size(); i ++) {
