@@ -123,6 +123,7 @@ public class PeerHandler extends Thread{
 								}while(!p.isUnchoked()); //need to review this condition
 								optUnchokedPeer = p;
 								unchokePeer(p);
+								logger.optUnchoke(p.getPeerId());
 							}
 							Thread.sleep(timeout);
 						}while(!sSocket.isClosed());
