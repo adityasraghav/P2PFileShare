@@ -39,6 +39,10 @@ public class PeerProcess extends Peer implements Runnable{
 	
 	private Logger logger;
 	
+	private boolean runner = true;
+	
+	
+	
 	public PeerProcess(String pid, String hName, String portno, String present){
 		super(pid,hName,portno,present);
 		logger = new Logger(Integer.parseInt(pid));
@@ -156,6 +160,7 @@ public class PeerProcess extends Peer implements Runnable{
     
 	@Override
 	public void run() {
+		while(runner){
 		System.out.println("Starting peer "+getPeerId());
 		fileData = new FileManager(getPeerId(), getFilePresent());
 		try {
@@ -184,6 +189,47 @@ public class PeerProcess extends Peer implements Runnable{
 				}
 			}
 		}));
+		}
+	}
+	
+	public void terminator(){
+
+		(new Thread() {
+			@Override
+			public void run() 
+			{
+				
+				try {
+					
+					int peerWithFile = 0;
+					int end = peers.size()+1;
+					HashMap<Integer,Peer> temp =peers;
+					int pieces = (int)Math.ceil((double)ConfigParser.getFileSize()/ConfigParser.getPieceSize());
+					while(peerWithFile<end)
+					{
+						Thread.sleep(60000);
+						if(fileData.hasCompleteFile())
+							peerWithFile++;
+						
+						for(Integer ind : temp.keySet())
+						{
+								Peer peer = temp.get(ind);
+								if(FileUtilities.checkComplete(peer.getBitfield(),pieces))
+								{
+									temp.remove(ind);
+									peerWithFile++;
+								}
+								
+						}
+						runner = false;
+					}
+					
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		}).start();
+
 	}
 	
 	public static void main(String[] ar){

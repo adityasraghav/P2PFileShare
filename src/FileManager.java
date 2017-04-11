@@ -240,7 +240,7 @@ public class FileManager
 	/**
 	 * @return true if the file has all the file pieces/complete file
 	 */
-	public static boolean hasCompleteFile(){
+	public static synchronized boolean hasCompleteFile(){
 		if(noOfPiecesAvailable == noOfFilePieces)
 			return true;
 		return false;

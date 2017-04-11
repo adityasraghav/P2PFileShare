@@ -53,4 +53,47 @@ public class FileUtilities {
 		update = (byte)(update << u);
 		bitfield[i] = (byte)(bitfield[i]|update);
 	}
+	
+	public static boolean checkComplete(byte[] bitfield, int size)
+	{
+		
+		boolean[] interestingPieces = new boolean[size];
+		int finLength;
+		
+		if(size>1)
+			finLength = (size%(8));
+		else
+			finLength = size;
+		
+		int start,end;		
+		for(int i=0,j=0;i<bitfield.length;i++)
+		{
+			if(i==size-1)
+			{
+				start = 8-finLength; 
+				end = finLength;
+			}	
+			else
+			{
+				start = 0;
+				end = 8;
+			}
+			boolean[] x = FileUtilities.byteToBoolean(bitfield[i]);
+			System.arraycopy(x, start, interestingPieces, j, end);
+			
+			if(j+8<size)
+				j=j+8;
+			else
+				j=size-finLength;
+		
+		}
+		
+		for(int k = 0;k<interestingPieces.length;k++)
+		{
+			if(interestingPieces[k]=false)
+				return false;	
+		}
+		return true;	
+	}
+	
 }
