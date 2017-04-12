@@ -14,8 +14,8 @@ public class Logger {
 	{
 		try 
 		{
-			logfile = new PrintWriter("log_peer_" +peerID+".log");
 			peerID = pID;
+			logfile = new PrintWriter("log_peer_" +peerID+".log");
 		}catch (FileNotFoundException e) 
 		{
 			System.out.println("Not able to create log writer");
