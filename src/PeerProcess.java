@@ -163,9 +163,10 @@ public class PeerProcess extends Peer implements Runnable{
 		}
 		startServer();
 		startSender();
-		terminator();
+		
 		pHandler.setSocket(sSocket);
 		pHandler.start();
+		//terminator();
 
 		Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
 			public void run() {
@@ -189,7 +190,6 @@ public class PeerProcess extends Peer implements Runnable{
 			@Override
 			public void run() 
 			{
-				
 				try {
 					
 					int peerWithFile = 0;
