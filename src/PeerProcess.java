@@ -29,29 +29,20 @@ public class PeerProcess extends Peer implements Runnable{
 	
 	private final PeerHandler pHandler;
 	
-	//Singleton object for Peer process
-	//private static PeerProcess peerProcess;
-	
 	//Server socket for this peer
 	private ServerSocket sSocket;
-	
-	private FileManager fileData;
-	
-	private Logger logger;
-	
+			
 	private boolean runner = true;
-	
-	
 	
 	public PeerProcess(String pid, String hName, String portno, String present){
 		super(pid,hName,portno,present);
-		logger = new Logger(Integer.parseInt(pid));
+		new Logger(Integer.parseInt(pid));
 		pHandler = new PeerHandler(sSocket, this.getInstance(), peers);
 	}
 	
 	public PeerProcess(int pid, String hName, int portno, boolean present){
 		super(pid,hName,portno,present);
-		logger = new Logger(pid);
+		new Logger(pid);
 		pHandler = new PeerHandler(sSocket, this.getInstance(), peers);
 	}
 	
@@ -72,7 +63,7 @@ public class PeerProcess extends Peer implements Runnable{
 								ObjectOutputStream out = new ObjectOutputStream(s.getOutputStream());
 								out.flush();
 								System.out.println("Handshake Message sent from peer "+getPeerId()+" to peer "+pNeighbor.getPeerId());
-								logger.connect(pNeighbor.getPeerId());
+								Logger.connect(pNeighbor.getPeerId());
 								out.writeObject(new HandShakeMsg(getPeerId()));
 								out.flush();
 								out.reset();
@@ -105,7 +96,7 @@ public class PeerProcess extends Peer implements Runnable{
 			public void run() {
 				while(!sSocket.isClosed()){
 					try {
-						ConnectionHandler conn = establishConnection();
+						establishConnection();
 					} catch (SocketException e) {
 						System.out.println("Peer "+getPeerId()+" is shutting down");
 					} catch (IOException | ClassNotFoundException e) {
@@ -138,7 +129,7 @@ public class PeerProcess extends Peer implements Runnable{
 		}
 		System.out.println("Received Handshake Message : "+
 				incoming.getPeerId()+" Header - "+incoming.getHeader());
-		logger.connected(incoming.getPeerId());
+		Logger.connected(incoming.getPeerId());
 		
 		// No need to send Handshake message here again, since all peers will send handshake messages to
 		// neighboring peers in startSender method as well as there is no place we are receiving second handshake
@@ -161,7 +152,9 @@ public class PeerProcess extends Peer implements Runnable{
 	@Override
 	public void run() {
 		System.out.println("Starting peer "+getPeerId());
-		fileData = new FileManager(getPeerId(), getFilePresent());
+		
+		new FileManager(getPeerId(), getFilePresent());
+		
 		try {
 			setBitfield(FileManager.getBitField());
 			sSocket = new ServerSocket(this.getPortNo());
@@ -240,6 +233,7 @@ public class PeerProcess extends Peer implements Runnable{
 	public static void main(String[] ar){
 		getConfiguration(ar);
 	}
+	
 	public static void getConfiguration(String[] ar)
 	{
 		String st;

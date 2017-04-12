@@ -6,19 +6,19 @@ import java.util.*;
 
 public class Logger {
 	
-	private PrintWriter logfile;
-	final DateFormat time = new SimpleDateFormat("MM-dd-yyyy HH:mm:ss");
-	private int peerID;
+	private static PrintWriter logfile;
+	final static DateFormat time = new SimpleDateFormat("MM-dd-yyyy HH:mm:ss");
+	private static int peerID;
 	
-	public Logger(int peerID)
+	public Logger(int pID)
 	{
 		try 
 		{
 			logfile = new PrintWriter("log_peer_" +peerID+".log");
-			this.peerID = peerID;
+			peerID = pID;
 		}catch (FileNotFoundException e) 
 		{
-			e.printStackTrace();
+			System.out.println("Not able to create log writer");
 		}
 	}
 	
@@ -29,7 +29,7 @@ public class Logger {
 	
 	//[Time]: Peer [peer_ID 1] <message> [peer_ID 2].
 	
-	public void connect(int ID)
+	public static void connect(int ID)
 	{
 		try
 		{
@@ -41,7 +41,7 @@ public class Logger {
 		}
 	}
 	
-	public void connected(int ID)
+	public static void connected(int ID)
 	{
 		try{
 			logfile.println(time.format(new Date()) +": Peer " + peerID + " is connected from Peer " + ID);
@@ -52,7 +52,7 @@ public class Logger {
 		}
 	}
 	
-	public void preferredNeighbors(ArrayList<Integer> neighbors)
+	public static void preferredNeighbors(ArrayList<Integer> neighbors)
 	{
 		try
 		{
@@ -64,7 +64,7 @@ public class Logger {
 		}	
 	}
 	
-	public void optUnchoke(int ID)
+	public static void optUnchoke(int ID)
 	{
 		try{
 			logfile.println(time.format(new Date()) +": Peer " + peerID + " has the optimistically-unchocked neighbor " + ID);
@@ -75,7 +75,7 @@ public class Logger {
 		}
 	}
 	
-	public void unchoked(int ID)
+	public static void unchoked(int ID)
 	{
 		try
 		{
@@ -87,7 +87,7 @@ public class Logger {
 		}
 	}
 	
-	public void choked(int ID)
+	public static void choked(int ID)
 	{
 		try
 		{
@@ -99,7 +99,7 @@ public class Logger {
 		}
 	}
 	
-	public void haveRecieved(int ID, int index)
+	public static void haveRecieved(int ID, int index)
 	{
 		try
 		{
@@ -112,7 +112,7 @@ public class Logger {
 		}
 	}
 	
-	public void notIntRecieved(int ID)
+	public static void notIntRecieved(int ID)
 	{
 		try
 		{
@@ -124,7 +124,7 @@ public class Logger {
 		}
 	}
 	
-	public void intRecieved(int ID)
+	public static void intRecieved(int ID)
 	{
 		try
 		{
@@ -136,7 +136,7 @@ public class Logger {
 		}
 	}
 	
-	public void downloading(int ID, int index, int count)
+	public static void downloading(int ID, int index, int count)
 	{	
 		try
 		{
@@ -148,7 +148,7 @@ public class Logger {
 		}
 	}
 	
-	public void downloadCompleted()
+	public static void downloadCompleted()
 	{
 		try
 		{
