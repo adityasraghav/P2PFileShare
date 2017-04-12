@@ -45,7 +45,7 @@ public class ConnectionHandler extends Thread{
 		//sock = s;
 		pHandler = p;
 		piecesDownloaded = 0;
-		host_sin = new ObjectInputStream(n.getHostSocket().getInputStream());
+		host_sin = n.getHostSocket() == null?null:new ObjectInputStream(n.getHostSocket().getInputStream());
 		logger = new Logger(h.getPeerId());
 	}
 	
