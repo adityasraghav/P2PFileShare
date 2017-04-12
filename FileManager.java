@@ -1,5 +1,3 @@
-package src;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -139,10 +137,7 @@ public class FileManager
 			
 			noOfPiecesAvailable++;
 			filePiecesOwned[piece.getIndex()] = true;
-			if(noOfPiecesAvailable==noOfFilePieces)
-				Logger.downloadCompleted();
-				
-			
+							
 		}catch (IOException e) 
 		{
 			e.printStackTrace();
@@ -252,6 +247,13 @@ public class FileManager
 	{
 		return noOfPiecesAvailable;
 	}
+
+	public static int total()
+	{
+		return noOfFilePieces;
+	}
+
+	
 	public static void checker(){
 
 		(new Thread() {
