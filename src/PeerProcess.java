@@ -13,6 +13,8 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 
+import jdk.nashorn.internal.runtime.regexp.joni.Config;
+
 /**
  * This is the main process which will run on each host, this class takes the responsibility
  * of performing all the peer responsibilities for that particular Peer which represents that host
@@ -190,12 +192,6 @@ public class PeerProcess extends Peer implements Runnable{
 			}
 		}));
 		
-		while(runner)
-		{
-			
-		}
-		System.out.println("Shutting Down");
-		System.exit(0);
 	}
 	
 	public void terminator(){
@@ -213,7 +209,7 @@ public class PeerProcess extends Peer implements Runnable{
 					int pieces = (int)Math.ceil((double)ConfigParser.getFileSize()/ConfigParser.getPieceSize());
 					while(peerWithFile<end)
 					{
-						Thread.sleep(10000);
+						Thread.sleep(ConfigParser.getUnchokingInterval()*2000);
 						if(FileManager.hasCompleteFile())
 							peerWithFile++;
 						
@@ -226,8 +222,9 @@ public class PeerProcess extends Peer implements Runnable{
 								}
 								
 						}
-						runner = false;
 					}
+					System.out.println("Shutting Down");
+					System.exit(0);
 					
 				} catch (InterruptedException e) {
 					e.printStackTrace();
