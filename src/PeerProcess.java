@@ -102,10 +102,11 @@ public class PeerProcess extends Peer implements Runnable{
 				while(!sSocket.isClosed()){
 					try {
 						ConnectionHandler conn = establishConnection();
+					} catch (SocketException e) {
+						System.out.println("Peer "+getPeerId()+" is shutting down");
 					} catch (IOException | ClassNotFoundException e) {
 						e.printStackTrace();
 					} catch (Exception e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}

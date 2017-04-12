@@ -95,11 +95,11 @@ public class ConnectionHandler extends Thread{
 							case HAVE:{
 								HavePayload have = (HavePayload)(recv.mPayload);
 								FileUtilities.updateBitfield(have.getIndex(),neighbor.getBitfield());
-								System.out.println("Peer "+neighbor.getPeerId()+" contains interesting file pieces");
 								logger.haveRecieved(neighbor.getPeerId(), have.getIndex());
 								//Check whether the piece is interesting and send interested message	
 								if(!FileManager.isInteresting(have.getIndex()))
 								{
+									System.out.println("Peer "+neighbor.getPeerId()+" contains interesting file pieces");
 									Message interested = new Message(MessageType.INTERESTED,null);
 									sendMessage(interested);
 								}
@@ -176,6 +176,8 @@ public class ConnectionHandler extends Thread{
 				int pieceIdx = FileManager.requestPiece(neighbor.getBitfield(), host.getBitfield(),neighbor.getPeerId());
 				if(pieceIdx == -1){
 					System.out.println("No more interesting pieces to request from peer "+neighbor.getPeerId());
+					Message not_interested = new Message(MessageType.NOT_INTERESTED,null);
+					sendMessage(not_interested);
 					return;
 				}
 				Payload requestPayload = new RequestPayload(pieceIdx);

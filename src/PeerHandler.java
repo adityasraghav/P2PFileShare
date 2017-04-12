@@ -56,9 +56,9 @@ public class PeerHandler extends Thread{
 		new Thread(){
 			public void run(){
 				try{
-					synchronized(interested){
-						// reselecting k preferred peers in time intervals of 'UnchokingInterval' from config
-						do{
+					// reselecting k preferred peers in time intervals of 'UnchokingInterval' from config
+					do{
+						synchronized(interested){
 							System.out.println("Finding k preferred peers");
 							if(interested.size() != 0){
 								kPeers = new ArrayList<Peer>();
@@ -81,7 +81,8 @@ public class PeerHandler extends Thread{
 									// chooses peer adds it to k preferred peers list and unchokes them
 									p.getConn().resetPiecesDownloaded();
 									kPeers.add(p);
-									unchokePeer(p);
+									if(!p.isUnchoked())
+										unchokePeer(p);
 								}
 								ArrayList<Integer> preferredPeers = new ArrayList<Integer>();
 								for (int i = 0; i < kPeers.size(); i ++) {
@@ -90,9 +91,9 @@ public class PeerHandler extends Thread{
 								logger.preferredNeighbors(preferredPeers);
 								chokePeers();
 							}
-							Thread.sleep(timeout);
-						}while(!sSocket.isClosed());
-					}
+						}
+						Thread.sleep(timeout);
+					}while(!sSocket.isClosed());
 				}catch(Exception e){
 					e.printStackTrace();
 				}
@@ -110,9 +111,9 @@ public class PeerHandler extends Thread{
 		new Thread(){
 			public void run(){
 				try{
-					synchronized(interested){
-						// reselecting optimistic peer in time intervals of 'OptimisticUnchokingInterval' from config
-						do{
+					// reselecting optimistic peer in time intervals of 'OptimisticUnchokingInterval' from config
+					do{
+						synchronized(interested){
 							System.out.println("Finding optimistic peer");
 							Peer p;
 							Random r = new Random();
@@ -120,14 +121,14 @@ public class PeerHandler extends Thread{
 							if(interested.size() != 0){
 								do{
 									p = prs[r.nextInt(prs.length)];
-								}while(!p.isUnchoked()); //need to review this condition
+								}while(p.isUnchoked()); //Selects a choked interesting peer
 								optUnchokedPeer = p;
 								unchokePeer(p);
 								logger.optUnchoke(p.getPeerId());
 							}
-							Thread.sleep(timeout);
-						}while(!sSocket.isClosed());
-					}
+						}
+						Thread.sleep(timeout);
+					}while(!sSocket.isClosed());
 				}catch(Exception e){
 					e.printStackTrace();
 				}
