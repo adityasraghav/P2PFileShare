@@ -29,11 +29,23 @@ public class Logger {
 	
 	//[Time]: Peer [peer_ID 1] <message> [peer_ID 2].
 	
-	public static void connect(int ID)
+	public static void makeconnection(int ID)
 	{
 		try
 		{
 			logfile.println(time.format(new Date()) +": Peer " + peerID + " makes a connection to Peer " + ID);
+			logfile.flush();
+		}catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+	
+	public static void connect(int ID)
+	{
+		try
+		{
+			logfile.println(time.format(new Date()) +": Peer " + peerID + " is connected from Peer " + ID);
 			logfile.flush();
 		}catch(Exception e)
 		{

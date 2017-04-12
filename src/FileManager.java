@@ -10,6 +10,8 @@ import java.util.Arrays;
 
 import java.util.Hashtable;
 
+import com.sun.org.apache.bcel.internal.generic.IF_ACMPEQ;
+
 
 /**
  * @author Aditya Singh Raghav
@@ -140,6 +142,9 @@ public class FileManager
 			
 			noOfPiecesAvailable++;
 			filePiecesOwned[piece.getIndex()] = true;
+			if(noOfPiecesAvailable==noOfFilePieces)
+				Logger.downloadCompleted();
+				
 			
 		}catch (IOException e) 
 		{
@@ -246,6 +251,10 @@ public class FileManager
 		return false;
 	}
 	
+	public static int getNumberOfPieces()
+	{
+		return noOfPiecesAvailable;
+	}
 	public static void checker(){
 
 		(new Thread() {

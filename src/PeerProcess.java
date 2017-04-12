@@ -13,8 +13,6 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 
-import jdk.nashorn.internal.runtime.regexp.joni.Config;
-
 /**
  * This is the main process which will run on each host, this class takes the responsibility
  * of performing all the peer responsibilities for that particular Peer which represents that host
@@ -33,8 +31,6 @@ public class PeerProcess extends Peer implements Runnable{
 	
 	//Server socket for this peer
 	private ServerSocket sSocket;
-			
-	private boolean runner = true;
 	
 	public PeerProcess(String pid, String hName, String portno, String present){
 		super(pid,hName,portno,present);
@@ -65,7 +61,7 @@ public class PeerProcess extends Peer implements Runnable{
 								ObjectOutputStream out = new ObjectOutputStream(s.getOutputStream());
 								out.flush();
 								System.out.println("Handshake Message sent from peer "+getPeerId()+" to peer "+pNeighbor.getPeerId());
-								Logger.connect(pNeighbor.getPeerId());
+								Logger.makeconnection(pNeighbor.getPeerId());
 								out.writeObject(new HandShakeMsg(getPeerId()));
 								out.flush();
 								out.reset();

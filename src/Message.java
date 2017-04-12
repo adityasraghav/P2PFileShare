@@ -10,6 +10,7 @@ public class Message implements Serializable{
 	private static final long serialVersionUID = -2925592711545151885L;
 
 	// Message Length in bytes excluding the length of message length field
+	//TODO implement length
 	private int mLength;
 	
 	// Message Type

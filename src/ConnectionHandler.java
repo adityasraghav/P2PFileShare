@@ -17,8 +17,6 @@ import java.net.SocketException;
  */
 public class ConnectionHandler extends Thread{
 	
-	//private Socket sock;
-		
 	private Peer host;
 	
 	private Peer neighbor;
@@ -40,16 +38,11 @@ public class ConnectionHandler extends Thread{
 		neighbor = n;
 		sin = i;
 		sout = o;
-		//sock = s;
 		pHandler = p;
 		piecesDownloaded = 0;
 		host_sin = n.getHostSocket() == null?null:new ObjectInputStream(n.getHostSocket().getInputStream());
 	}
-	
-	/*public void setSocket(Socket s){
-		sock = s;
-	}*/
-	
+		
 	public void setHostInputStream(ObjectInputStream in){
 		host_sin = in;
 	}
@@ -82,11 +75,12 @@ public class ConnectionHandler extends Thread{
 						if(recv != null){
 							switch (recv.getMsgType()){
 							case UNCHOKE:{
+								Logger.unchoked(neighbor.getPeerId());
 								flagUnchoke = true;
 								sendRequest();
 								break;}
 							case CHOKE:
-								//TODO stop sending file pieces
+								Logger.choked(neighbor.getPeerId());								
 								flagUnchoke = false;
 								break;
 							case HAVE:{
@@ -148,7 +142,7 @@ public class ConnectionHandler extends Thread{
 
 								pHandler.sendHaveAll(((PiecePayload)recv.mPayload).getIndex());
 								piecesDownloaded++;
-								Logger.downloading(neighbor.getPeerId(), ((PiecePayload)recv.mPayload).getIndex(), piecesDownloaded);
+								Logger.downloading(neighbor.getPeerId(), ((PiecePayload)recv.mPayload).getIndex(), FileManager.getNumberOfPieces());
 								if(flagUnchoke)sendRequest();
 								break;}
 							}

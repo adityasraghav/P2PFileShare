@@ -7,7 +7,6 @@ import java.io.IOException;
 
 public class ConfigParser 
 {
-
 		private static int numberOfPreferredNeighbors;
 		private static int unchokingInterval;
 		private static int optimisticUnchokingInterval;
@@ -49,6 +48,7 @@ public class ConfigParser
 							break;
 					}
 				}
+				in.close();
 			} catch (FileNotFoundException e)
 			{
 				e.printStackTrace();
